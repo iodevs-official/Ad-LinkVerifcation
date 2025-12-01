@@ -1,0 +1,36 @@
+
+
+name: Create Blank Branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Name of the blank branch to create'
+        required: true
+        default: 'Router-Api'
+
+jobs:
+  create_blank_branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create blank branch
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+          # Create an orphan branch (no parent commit)
+          git checkout --orphan ${{ github.event.inputs.branch_name }}
+
+          # Remove all files from the index (since it's orphaned, this is clean)
+          git rm -rf .
+
+          # Create an empty initial commit
+          git commit --allow-empty -m "Initial empty commit"
+
+          # Push the branch to the remote repository
+          git push origin ${{ github.event.inputs.branch_name }}
